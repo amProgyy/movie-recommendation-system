@@ -3,10 +3,12 @@ from fastapi import Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from src.recommendation import MovieRecommender
+from src.recommendation.service import MovieRecommender
+from src.auth.router import router as auth_router
 
 app = FastAPI(title="movie recommendation system")
 app.mount("/static", StaticFiles(directory="static"), name='static')
+app.include_router(auth_router)
 
 templates = Jinja2Templates(directory='templates')
 
