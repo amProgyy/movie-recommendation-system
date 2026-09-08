@@ -1,18 +1,16 @@
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
 
 from src.users.models import User
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated = "auto"
-)
+pswdhash = PasswordHash.recommended() 
+
 
 def hash_pwd(pwd : str) -> str:
-    return pwd_context.hash(pwd)
+    return pswdhash.hash(pwd)
 
 def verify_pwd(plain_pwd : str, hashed_pwd : str) -> bool:
-    return pwd_context.verify(plain_pwd, hashed_pwd)
+    return pswdhash.verify(plain_pwd, hashed_pwd)
 
 def get_user_by_email(db : Session, email : str):
     return db.query(User).filter(User.email==email).first()
