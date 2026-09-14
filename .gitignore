@@ -10,8 +10,7 @@ __pycache__/
 *.pyc
 
 
-# Dataset
-data/
+
 
 try.py
 
