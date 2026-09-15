@@ -4,8 +4,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from src.recommendation.service import MovieRecommender
+from src.recommendation.schemas import RecommendationRequest
 from src.auth.router import router as auth_router
 from src.users.schemas import UserCreate
+from src.database import Base, engine
+from src.users import models
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="movie recommendation system")
 app.mount("/static", StaticFiles(directory="static"), name='static')
@@ -13,7 +18,7 @@ app.include_router(auth_router)
 
 templates = Jinja2Templates(directory='templates')
 
-recommender = MovieRecommender()
+
 
 @app.get('/', response_class=HTMLResponse)
 async def home(request: Request):
@@ -53,17 +58,18 @@ async def sign_in(request: Request):
         
     )
 
-# @app.get('/recommend')
-# async def recommend(movie:str, no_of_movies: int = 5):
+@app.post('/recommend')
+async def recommend(data: RecommendationRequest):
+    recommender = MovieRecommender()
 
-#     recommendations = recommender.recommend(
-#         movie_title=movie, no_of_movies=no_of_movies
-#     )
-#     print(recommendations)
-#     return {
-#         'recommendation' : recommendations,
-#         'movie': movie,
-#     }
+    recommendations = recommender.recommend(
+        movie_title=data.movie, no_of_movies=data.no_of_movies
+    )
+    print(recommendations)
+    return {
+        'recommendation' : recommendations,
+        'movie': data.movie,
+    }
 
 @app.get('/recommend', response_class=HTMLResponse)
 async def recommend(request: Request):
